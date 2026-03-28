@@ -7,9 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom border colors */
-        .border-open { border-top: 4px solid #238636; }   /* Green */
-        .border-closed { border-top: 4px solid #5A32FA; } /* Purple */
+        /* Card Top Border Colors */
+        .border-open { border-top: 4px solid #238636; }   /* Green border for Open */
+        .border-closed { border-top: 4px solid #5A32FA; } /* Purple border for Closed */
     </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 font-sans min-h-screen">
@@ -41,7 +41,8 @@
                     <small class="text-[#5A32FA] mt-1 block">Default: admin123</small>
                 </div>
 
-                <p id="error-msg" class="text-red-500 text-sm hidden mb-2">wrong username & password!</p>
+                <p id="error-msg" class="text-red-500 text-sm hidden mb-2 font-medium">wrong username & password!</p>
+                
                 <button type="submit" class="btn w-full bg-[#5A32FA] hover:bg-purple-700 text-white border-none">Sign In</button>
             </form>
 
@@ -81,17 +82,15 @@
             <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
                 
                 <div class="flex flex-wrap gap-2 mb-4 pb-4 border-b">
-                    <button id="tab-all" class="tab-btn btn btn-sm bg-[#5A32FA] text-white border-none flex-1 sm:flex-none sm:w-24" onclick="filterData('all')">All</button>
-                    <button id="tab-open" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 font-normal" onclick="filterData('open')">Open</button>
-                    <button id="tab-closed" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 font-normal" onclick="filterData('closed')">Closed</button>
+                    <button id="tab-all" class="tab-btn btn btn-sm bg-[#5A32FA] text-white border-none flex-1 sm:flex-none sm:w-24 rounded" onclick="filterData('all')">All</button>
+                    <button id="tab-open" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 rounded font-normal" onclick="filterData('open')">Open</button>
+                    <button id="tab-closed" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 rounded font-normal" onclick="filterData('closed')">Closed</button>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div class="flex items-center gap-3">
-                        <div>
-                            <h2 class="font-bold text-lg"><span id="total-issues">0</span> Issues</h2>
-                            <p class="text-xs text-gray-500">Track and manage your project issues</p>
-                        </div>
+                    <div>
+                        <h2 class="font-bold text-lg"><span id="total-issues">0</span> Issues</h2>
+                        <p class="text-xs text-gray-500">Track and manage your project issues</p>
                     </div>
                     
                     <div class="flex gap-4 text-xs font-semibold text-gray-600 w-full sm:w-auto justify-end">
@@ -115,26 +114,39 @@
     </div>
 
     <dialog id="issue-modal" class="modal modal-bottom sm:modal-middle">
-        <div class="modal-box p-6 sm:p-8 bg-white rounded-t-2xl sm:rounded-lg">
+        <div class="modal-box w-full sm:w-11/12 max-w-2xl p-6 sm:p-8 bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border">
             
-            <h3 class="font-bold text-xl sm:text-2xl mb-4" id="modal-title">Issue Title</h3>
+            <h3 class="font-bold text-2xl sm:text-[28px] mb-4 text-[#1f2328]" id="modal-title">Fix Navigation Menu On Mobile Devices</h3>
             
-            <p class="text-sm mb-2"><strong>Status:</strong> <span id="modal-status">Open</span></p>
-            <p class="text-sm mb-2"><strong>Labels:</strong> <span id="modal-labels">Bug</span></p>
-
-            <p class="text-gray-700 text-sm mb-6 mt-4 p-4 bg-gray-100 rounded" id="modal-desc">
-                Description goes here...
-            </p>
-
-            <div class="border-t pt-4 space-y-1">
-                <p class="text-sm"><strong>Author:</strong> <span id="modal-author">User</span></p>
-                <p class="text-sm"><strong>Created At:</strong> <span id="modal-date">Date</span></p>
-                <p class="text-sm"><strong>Priority:</strong> <span id="modal-priority">High</span></p>
+            <div class="flex flex-wrap items-center gap-2 mb-5 text-[15px] text-gray-500 font-medium">
+                <span id="modal-status" class="px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#00A86B]">Opened</span>
+                <span class="text-gray-400 hidden sm:inline">•</span>
+                <span>Opened by <span id="modal-author" class="text-gray-600">john_doe</span></span>
+                <span class="text-gray-400 hidden sm:inline">•</span>
+                <span id="modal-date">1/15/2024</span>
             </div>
 
-            <div class="modal-action">
+            <div class="flex flex-wrap gap-3 mb-6" id="modal-labels">
+                </div>
+
+            <p class="text-gray-600 text-[16px] mb-8 leading-relaxed" id="modal-desc">
+                The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.
+            </p>
+
+            <div class="bg-[#F8F9FA] p-5 rounded-xl flex justify-between items-center mb-6">
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Assignee:</p>
+                    <p class="font-bold text-gray-800 text-[16px]" id="modal-assignee">john_doe</p>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-sm mb-1">Priority:</p>
+                    <span id="modal-priority" class="inline-block px-4 py-1 rounded-full text-xs font-bold text-white bg-[#EF4444] shadow-sm">HIGH</span>
+                </div>
+            </div>
+
+            <div class="modal-action mt-0 flex justify-end">
                 <form method="dialog" class="w-full sm:w-auto">
-                    <button class="btn w-full sm:w-auto bg-gray-800 text-white hover:bg-gray-900">Close</button>
+                    <button class="btn w-full sm:w-auto bg-[#5A32FA] text-white hover:bg-purple-700 border-none px-8 rounded-lg shadow-sm">Close</button>
                 </form>
             </div>
         </div>
