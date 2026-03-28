@@ -38,7 +38,7 @@ loginForm.addEventListener("submit", function(event) {
     }
 });
 
-// === Fetch Data from API ===
+// === Fetch Data from API & Generate 50 Cards ===
 async function fetchIssuesFromAPI() {
     loadingSpinner.classList.remove("hidden");
     issueContainer.innerHTML = ""; 
@@ -46,9 +46,25 @@ async function fetchIssuesFromAPI() {
     try {
         let response = await fetch("https://phi-lab-server.vercel.app/api/v1/lab/issues");
         let data = await response.json();
+        let apiIssues = data.data || data || []; 
+
+        let generated50Issues = [];
         
-        // API usually sends data inside a 'data' object, checking both
-        allIssuesData = data.data || data || []; 
+        // Loop 50 times to generate exactly 50 cards
+        for (let i = 0; i < 50; i++) {
+            // Cycle through API data to keep statuses, labels, priorities realistic
+            let baseIssue = apiIssues[i % apiIssues.length] || {}; 
+            
+            generated50Issues.push({
+                ...baseIssue,
+                _id: (baseIssue._id || "id") + "_" + i, // Unique ID so modals work properly
+                // Hardcoding title and description as requested
+                title: "Fix Navigation Menu On Mobile Devices",
+                description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior."
+            });
+        }
+
+        allIssuesData = generated50Issues; 
         displayIssues(allIssuesData);
     } catch (error) {
         console.log("Error finding issues:", error);
@@ -73,7 +89,7 @@ function displayIssues(issuesArray) {
         let borderColorClass = isClosed ? "border-brand-purple" : "border-brand-green";
         let iconColorClass = isClosed ? "brand-purple" : "brand-green";
         
-        // 2. Logic for Priority styling (High = Red, Medium = Yellow/Orange, Low = Gray)
+        // 2. Logic for Priority styling
         let priorityText = issue.priority ? issue.priority.toUpperCase() : "LOW";
         let priorityStyle = "text-gray-500 bg-gray-100"; // default
         if (priorityText === "HIGH") {
@@ -107,7 +123,7 @@ function displayIssues(issuesArray) {
 
         // Creating the HTML Card
         let cardHTML = `
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-t-4 ${borderColorClass} flex flex-col cursor-pointer hover:shadow-md transition-shadow" onclick="showIssueDetails('${issue._id || issue.id}')">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-t-4 ${borderColorClass} flex flex-col cursor-pointer hover:shadow-md transition-shadow" onclick="showIssueDetails('${issue._id}')">
                 
                 <div class="flex justify-between items-start mb-3">
                     <div class="${iconColorClass}">
@@ -126,7 +142,7 @@ function displayIssues(issuesArray) {
                 <div class="mt-auto"></div>
 
                 <div class="border-t pt-2 mt-2">
-                    <p class="text-[11px] text-gray-400 mb-1">#${(issue._id || "000").substring(0,5)} by ${issue.author || "john_doe"}</p>
+                    <p class="text-[11px] text-gray-400 mb-1">#${issue._id.substring(0,5)} by ${issue.author || "john_doe"}</p>
                     <p class="text-[11px] text-gray-400">${formattedDate}</p>
                 </div>
             </div>
@@ -151,13 +167,12 @@ function filterIssues(category) {
     activeTab.classList.remove("bg-white", "text-gray-600", "border-gray-200");
     activeTab.classList.add("bg-brand-purple", "text-white", "border-none");
 
-    // 1. Clear container and show spinner
+    // Clear container and show spinner
     issueContainer.innerHTML = "";
     loadingSpinner.classList.remove("hidden");
 
-    // 2. Add fake delay to simulate loading when switching tabs
+    // Add fake delay to simulate loading
     setTimeout(function() {
-        // Filter Logic
         if (category === "All") {
             displayIssues(allIssuesData);
         } else {
@@ -167,12 +182,12 @@ function filterIssues(category) {
             displayIssues(filteredData);
         }
         
-        // 3. Hide spinner after data is loaded
+        // Hide spinner after data is loaded
         loadingSpinner.classList.add("hidden");
-    }, 500); // 500ms delay
+    }, 500); 
 }
 
-// === Search Functionality (Input change event) ===
+// === Search Functionality ===
 document.getElementById("search-box").addEventListener("input", async function(event) {
     let searchText = event.target.value.trim();
     
@@ -180,13 +195,22 @@ document.getElementById("search-box").addEventListener("input", async function(e
         try {
             let response = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issues/search?q=${searchText}`);
             let searchResult = await response.json();
-            let dataToShow = searchResult.data || searchResult || [];
-            displayIssues(dataToShow);
+            let apiSearchData = searchResult.data || searchResult || [];
+            
+            // Format search results to match the required UI text
+            let formattedSearchData = apiSearchData.map((issue, index) => ({
+                ...issue,
+                _id: issue._id + "_search_" + index,
+                title: "Fix Navigation Menu On Mobile Devices",
+                description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior."
+            }));
+            
+            displayIssues(formattedSearchData);
         } catch (error) {
             console.log("Search error:", error);
         }
     } else {
-        displayIssues(allIssuesData); // Show all if input is empty
+        displayIssues(allIssuesData); // Show all 50 if input is empty
     }
 });
 
@@ -198,12 +222,17 @@ async function showIssueDetails(id) {
     document.getElementById("modal-desc").innerText = "Loading data...";
 
     try {
-        let res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`);
+        // Since we modified the ID for duplicates, we need to extract original ID to fetch from API
+        let originalId = id.split('_')[0]; 
+        
+        let res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${originalId}`);
         let singleData = await res.json();
         let issue = singleData.data || singleData;
 
-        document.getElementById("modal-title").innerText = issue.title;
-        document.getElementById("modal-desc").innerText = issue.description;
+        // Force the title and description to match the UI card
+        document.getElementById("modal-title").innerText = "Fix Navigation Menu On Mobile Devices";
+        document.getElementById("modal-desc").innerText = "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.";
+        
         document.getElementById("modal-author").innerText = issue.author || "Unknown";
         document.getElementById("modal-assignee").innerText = issue.assignee || "Fahim Ahmed";
         document.getElementById("modal-priority").innerText = (issue.priority || "HIGH").toUpperCase();
