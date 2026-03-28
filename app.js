@@ -3,7 +3,7 @@ const loginPage = document.getElementById("login-page");
 const mainPage = document.getElementById("main-page");
 const loginForm = document.getElementById("login-form");
 const errorMsg = document.getElementById("error-msg");
-const pageTransitionLoader = document.getElementById("page-transition-loader"); // New loader
+const pageTransitionLoader = document.getElementById("page-transition-loader");
 
 const issueContainer = document.getElementById("issue-container");
 const loadingSpinner = document.getElementById("loading-spinner");
@@ -21,14 +21,14 @@ loginForm.addEventListener("submit", function(event) {
 
     if (userVal === "admin" && passVal === "admin123") {
         
-        // 1. Show the full screen transition loader
+        // Show the full screen transition loader
         pageTransitionLoader.classList.remove("hidden");
         
-        // 2. Add a slight delay to simulate page loading (800 milliseconds)
+        // Add a slight delay to simulate page loading
         setTimeout(function() {
-            pageTransitionLoader.classList.add("hidden"); // Hide loader
-            loginPage.classList.add("hidden");            // Hide login page
-            mainPage.classList.remove("hidden");          // Show main dashboard
+            pageTransitionLoader.classList.add("hidden"); 
+            loginPage.classList.add("hidden");            
+            mainPage.classList.remove("hidden");          
             
             fetchIssuesFromAPI(); // Fetch the API data
         }, 800);
@@ -151,15 +151,25 @@ function filterIssues(category) {
     activeTab.classList.remove("bg-white", "text-gray-600", "border-gray-200");
     activeTab.classList.add("bg-brand-purple", "text-white", "border-none");
 
-    // Filter Logic
-    if (category === "All") {
-        displayIssues(allIssuesData);
-    } else {
-        let filteredData = allIssuesData.filter(function(issue) {
-            return issue.status && issue.status.toLowerCase() === category.toLowerCase();
-        });
-        displayIssues(filteredData);
-    }
+    // 1. Clear container and show spinner
+    issueContainer.innerHTML = "";
+    loadingSpinner.classList.remove("hidden");
+
+    // 2. Add fake delay to simulate loading when switching tabs
+    setTimeout(function() {
+        // Filter Logic
+        if (category === "All") {
+            displayIssues(allIssuesData);
+        } else {
+            let filteredData = allIssuesData.filter(function(issue) {
+                return issue.status && issue.status.toLowerCase() === category.toLowerCase();
+            });
+            displayIssues(filteredData);
+        }
+        
+        // 3. Hide spinner after data is loaded
+        loadingSpinner.classList.add("hidden");
+    }, 500); // 500ms delay
 }
 
 // === Search Functionality (Input change event) ===
