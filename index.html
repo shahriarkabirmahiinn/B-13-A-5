@@ -7,53 +7,51 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Colors */
-        .brand-purple { color: #5A32FA; }
-        .bg-brand-purple { background-color: #5A32FA; }
-        .border-brand-purple { border-color: #5A32FA; }
-        .brand-green { color: #238636; }
-        .border-brand-green { border-color: #238636; }
+        /* Custom border colors */
+        .border-open { border-top: 4px solid #238636; }   /* Green */
+        .border-closed { border-top: 4px solid #5A32FA; } /* Purple */
     </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 font-sans min-h-screen">
 
-    <div id="page-transition-loader" class="hidden fixed inset-0 bg-white/90 z-50 flex flex-col justify-center items-center transition-all duration-300">
-        <span class="loading loading-spinner loading-lg brand-purple mb-4"></span>
-        <p class="text-gray-500 font-medium animate-pulse">Loading Dashboard...</p>
+    <div id="page-loader" class="hidden fixed inset-0 bg-white/90 z-50 flex justify-center items-center">
+        <span class="loading loading-spinner loading-lg text-[#5A32FA]"></span>
     </div>
 
     <div id="login-page" class="flex justify-center items-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-xl shadow-sm border max-w-md w-full text-center">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow border max-w-md w-full text-center">
+            
             <div class="flex justify-center mb-4">
-                <svg height="60" viewBox="0 0 16 16" width="60" fill="#1f2328"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+                <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="Logo" class="w-16 h-16">
             </div>
-            <h1 class="text-2xl font-bold mb-1">GitHub Issues Tracker</h1>
+            
+            <h1 class="text-xl sm:text-2xl font-bold mb-1">GitHub Issues Tracker</h1>
             <p class="text-gray-500 mb-6 text-sm">Sign in to manage your issues</p>
 
             <form id="login-form" class="text-left">
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1">Username</label>
                     <input type="text" id="username" class="input input-bordered w-full" placeholder="Enter Username" required>
-                    <small class="brand-purple mt-1 block">Default: admin</small>
+                    <small class="text-[#5A32FA] mt-1 block">Default: admin</small>
                 </div>
                 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1">Password</label>
                     <input type="password" id="password" class="input input-bordered w-full" placeholder="Enter Password" required>
-                    <small class="brand-purple mt-1 block">Default: admin123</small>
+                    <small class="text-[#5A32FA] mt-1 block">Default: admin123</small>
                 </div>
 
-                <p id="error-msg" class="text-red-500 text-sm hidden mb-2">Wrong username or password!</p>
-                <button type="submit" class="btn w-full bg-brand-purple hover:bg-purple-700 text-white border-none mt-2">Sign In</button>
+                <p id="error-msg" class="text-red-500 text-sm hidden mb-2">wrong username & password!</p>
+                <button type="submit" class="btn w-full bg-[#5A32FA] hover:bg-purple-700 text-white border-none">Sign In</button>
             </form>
 
             <div class="divider my-5 text-gray-500 text-sm">OR</div>
             
             <div class="text-center">
-                <p class="text-gray-500 mb-3 text-sm">Demo Credentials:</p>
-                <div class="bg-[#F8F9FA] p-5 rounded-xl flex flex-col items-center justify-center text-sm border-none">
-                    <p class="text-gray-800 mb-1"><strong>Username:</strong> admin</p>
-                    <p class="text-gray-800"><strong>Password:</strong> admin123</p>
+                <p class="text-gray-500 mb-2 text-sm">Demo Credentials:</p>
+                <div class="bg-gray-100 p-4 rounded-xl flex flex-col items-center justify-center text-sm">
+                    <p><strong>Username:</strong> admin</p>
+                    <p><strong>Password:</strong> admin123</p>
                 </div>
             </div>
         </div>
@@ -61,90 +59,82 @@
 
     <div id="main-page" class="hidden">
         
-        <div class="bg-white border-b px-6 py-3 flex justify-between items-center sticky top-0 z-10">
-            <div class="flex items-center gap-2 font-bold text-lg">
-                <svg height="24" viewBox="0 0 16 16" width="24" fill="#1f2328"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+        <div class="bg-white border-b px-4 sm:px-6 py-3 flex flex-col sm:flex-row justify-between items-center sticky top-0 z-10 gap-4 sm:gap-0">
+            
+            <div class="flex items-center gap-2 font-bold text-lg w-full sm:w-auto justify-center sm:justify-start">
+                <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="Logo" class="w-6 h-6">
                 GitHub Issues Tracker
             </div>
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input type="text" id="search-box" class="input input-bordered input-sm w-64 pl-9" placeholder="Search issues...">
-                </div>
-                <button class="btn btn-sm bg-brand-purple hover:bg-purple-700 text-white border-none">+ New Issue</button>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <form id="search-form" class="relative flex-1 sm:w-64">
+                    <img src="https://cdn-icons-png.flaticon.com/512/54/54481.png" alt="Search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 opacity-50">
+                    <input type="text" id="search-box" class="input input-bordered input-sm w-full pl-9" placeholder="Search issues...">
+                </form>
+                <button class="btn btn-sm bg-[#5A32FA] hover:bg-purple-700 text-white border-none whitespace-nowrap">+ New Issue</button>
             </div>
+
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
             
-            <div class="bg-white rounded-lg shadow-sm border p-4 mb-4">
-                <div class="flex gap-2 mb-4 pb-4 border-b">
-                    <button id="tab-all" class="btn btn-sm bg-brand-purple text-white border-none w-24 rounded" onclick="filterIssues('All')">All</button>
-                    <button id="tab-open" class="btn btn-sm bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 w-24 rounded font-normal" onclick="filterIssues('Open')">Open</button>
-                    <button id="tab-closed" class="btn btn-sm bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 w-24 rounded font-normal" onclick="filterIssues('Closed')">Closed</button>
+            <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
+                
+                <div class="flex flex-wrap gap-2 mb-4 pb-4 border-b">
+                    <button id="tab-all" class="tab-btn btn btn-sm bg-[#5A32FA] text-white border-none flex-1 sm:flex-none sm:w-24" onclick="filterData('all')">All</button>
+                    <button id="tab-open" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 font-normal" onclick="filterData('open')">Open</button>
+                    <button id="tab-closed" class="tab-btn btn btn-sm bg-white border border-gray-300 text-gray-600 flex-1 sm:flex-none sm:w-24 font-normal" onclick="filterData('closed')">Closed</button>
                 </div>
                 
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center brand-purple">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3.5a.5.5 0 0 1-.5-.5v-3.5A.5.5 0 0 1 8 4z"/></svg>
-                        </div>
                         <div>
-                            <h2 class="font-bold text-md"><span id="total-issues">0</span> Issues</h2>
+                            <h2 class="font-bold text-lg"><span id="total-issues">0</span> Issues</h2>
                             <p class="text-xs text-gray-500">Track and manage your project issues</p>
                         </div>
                     </div>
-                    <div class="flex gap-4 text-xs font-semibold text-gray-600">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#238636]"></span> Open</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#5A32FA]"></span> Closed</span>
+                    
+                    <div class="flex gap-4 text-xs font-semibold text-gray-600 w-full sm:w-auto justify-end">
+                        <span class="flex items-center gap-1">
+                            <span class="w-3 h-3 rounded-full bg-[#238636]"></span> Open
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <span class="w-3 h-3 rounded-full bg-[#5A32FA]"></span> Closed
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <div id="loading-spinner" class="text-center py-10 hidden">
-                <span class="loading loading-spinner loading-lg brand-purple"></span>
+            <div id="data-spinner" class="text-center py-10 hidden">
+                <span class="loading loading-spinner loading-lg text-[#5A32FA]"></span>
             </div>
 
-            <div id="issue-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div id="issue-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 </div>
         </div>
     </div>
 
-    <dialog id="issue-modal" class="modal">
-        <div class="modal-box w-11/12 max-w-2xl p-8 rounded-2xl shadow-xl border">
-            <h3 class="font-bold text-2xl mb-4 text-gray-800" id="modal-title">Issue Title</h3>
+    <dialog id="issue-modal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box p-6 sm:p-8 bg-white rounded-t-2xl sm:rounded-lg">
             
-            <div class="flex items-center gap-2 mb-5 text-sm text-gray-500 font-medium">
-                <span id="modal-status" class="px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#00A86B]">Opened</span>
-                <span class="text-gray-400">•</span>
-                <span>Opened by <span id="modal-author" class="text-gray-600">Fahim Ahmed</span></span>
-                <span class="text-gray-400">•</span>
-                <span id="modal-date">22/02/2026</span>
-            </div>
+            <h3 class="font-bold text-xl sm:text-2xl mb-4" id="modal-title">Issue Title</h3>
+            
+            <p class="text-sm mb-2"><strong>Status:</strong> <span id="modal-status">Open</span></p>
+            <p class="text-sm mb-2"><strong>Labels:</strong> <span id="modal-labels">Bug</span></p>
 
-            <div class="flex flex-wrap gap-2 mb-6" id="modal-labels">
-                </div>
-
-            <p class="text-gray-600 text-[15px] mb-8 leading-relaxed" id="modal-desc">
-                Description will go here.
+            <p class="text-gray-700 text-sm mb-6 mt-4 p-4 bg-gray-100 rounded" id="modal-desc">
+                Description goes here...
             </p>
 
-            <div class="bg-gray-50 p-5 rounded-xl flex justify-between items-center mb-6 border border-gray-100">
-                <div>
-                    <p class="text-gray-500 text-sm mb-1">Assignee:</p>
-                    <p class="font-bold text-gray-800 text-[15px]" id="modal-assignee">Fahim Ahmed</p>
-                </div>
-                <div>
-                    <p class="text-gray-500 text-sm mb-1">Priority:</p>
-                    <span id="modal-priority" class="inline-block px-4 py-1 rounded-full text-xs font-bold text-white bg-[#EF4444] shadow-sm">HIGH</span>
-                </div>
+            <div class="border-t pt-4 space-y-1">
+                <p class="text-sm"><strong>Author:</strong> <span id="modal-author">User</span></p>
+                <p class="text-sm"><strong>Created At:</strong> <span id="modal-date">Date</span></p>
+                <p class="text-sm"><strong>Priority:</strong> <span id="modal-priority">High</span></p>
             </div>
 
-            <div class="modal-action mt-0 flex justify-end">
-                <form method="dialog">
-                    <button class="btn bg-[#5A32FA] text-white hover:bg-purple-700 border-none px-8 rounded-lg shadow-sm">Close</button>
+            <div class="modal-action">
+                <form method="dialog" class="w-full sm:w-auto">
+                    <button class="btn w-full sm:w-auto bg-gray-800 text-white hover:bg-gray-900">Close</button>
                 </form>
             </div>
         </div>
