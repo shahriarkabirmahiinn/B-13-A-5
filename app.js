@@ -21,16 +21,14 @@ loginForm.addEventListener("submit", function(event) {
 
     if (userVal === "admin" && passVal === "admin123") {
         
-        // Show the full screen transition loader
         pageTransitionLoader.classList.remove("hidden");
         
-        // Add a slight delay to simulate page loading
         setTimeout(function() {
             pageTransitionLoader.classList.add("hidden"); 
             loginPage.classList.add("hidden");            
             mainPage.classList.remove("hidden");          
             
-            fetchIssuesFromAPI(); // Fetch the API data
+            fetchIssuesFromAPI(); // Fetch the real API data
         }, 800);
 
     } else {
@@ -38,7 +36,7 @@ loginForm.addEventListener("submit", function(event) {
     }
 });
 
-// === Fetch Data from API & Generate 50 Cards ===
+// === Fetch Real Data from API & Modify Titles/Labels for UI ===
 async function fetchIssuesFromAPI() {
     loadingSpinner.classList.remove("hidden");
     issueContainer.innerHTML = ""; 
@@ -48,23 +46,26 @@ async function fetchIssuesFromAPI() {
         let data = await response.json();
         let apiIssues = data.data || data || []; 
 
-        let generated50Issues = [];
-        
-        // Loop 50 times to generate exactly 50 cards
-        for (let i = 0; i < 50; i++) {
-            // Cycle through API data to keep statuses, labels, priorities realistic
-            let baseIssue = apiIssues[i % apiIssues.length] || {}; 
+        // Map through the REAL API data and override exactly what you asked for
+        let modifiedIssues = apiIssues.map((issue, index) => {
             
-            generated50Issues.push({
-                ...baseIssue,
-                _id: (baseIssue._id || "id") + "_" + i, // Unique ID so modals work properly
-                // Hardcoding title and description as requested
-                title: "Fix Navigation Menu On Mobile Devices",
-                description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior."
-            });
-        }
+            // Default labels for all cards
+            let customLabels = ["bug", "help wanted"];
+            
+            // 6th card (index 5) gets only "ENHANCEMENT"
+            if (index === 5) {
+                customLabels = ["enhancement"];
+            }
 
-        allIssuesData = generated50Issues; 
+            return {
+                ...issue, // Keep actual ID, status, priority, author from API
+                title: "Fix Navigation Menu On Mobile Devices",
+                description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.",
+                labels: customLabels
+            };
+        });
+
+        allIssuesData = modifiedIssues; 
         displayIssues(allIssuesData);
     } catch (error) {
         console.log("Error finding issues:", error);
@@ -117,13 +118,13 @@ function displayIssues(issuesArray) {
             });
         }
 
-        // 4. Formatting Date
+        // 4. Date format
         let issueDate = issue.createdAt || issue.date;
         let formattedDate = issueDate ? new Date(issueDate).toLocaleDateString() : "Unknown Date";
 
         // Creating the HTML Card
         let cardHTML = `
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-t-4 ${borderColorClass} flex flex-col cursor-pointer hover:shadow-md transition-shadow" onclick="showIssueDetails('${issue._id}')">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-t-4 ${borderColorClass} flex flex-col cursor-pointer hover:shadow-md transition-shadow" onclick="showIssueDetails('${issue._id || issue.id}')">
                 
                 <div class="flex justify-between items-start mb-3">
                     <div class="${iconColorClass}">
@@ -132,8 +133,8 @@ function displayIssues(issuesArray) {
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${priorityStyle}">${priorityText}</span>
                 </div>
                 
-                <h3 class="font-bold text-sm text-gray-800 mb-2 line-clamp-2">${issue.title || "No Title"}</h3>
-                <p class="text-xs text-gray-500 mb-4 line-clamp-2">${issue.description || "No description provided."}</p>
+                <h3 class="font-bold text-sm text-gray-800 mb-2 line-clamp-2">${issue.title}</h3>
+                <p class="text-xs text-gray-500 mb-4 line-clamp-2">${issue.description}</p>
                 
                 <div class="flex flex-wrap gap-2 mb-4">
                     ${labelsHtml}
@@ -142,7 +143,7 @@ function displayIssues(issuesArray) {
                 <div class="mt-auto"></div>
 
                 <div class="border-t pt-2 mt-2">
-                    <p class="text-[11px] text-gray-400 mb-1">#${issue._id.substring(0,5)} by ${issue.author || "john_doe"}</p>
+                    <p class="text-[11px] text-gray-400 mb-1">#${(issue._id || "000").substring(0,5)} by ${issue.author || "Unknown"}</p>
                     <p class="text-[11px] text-gray-400">${formattedDate}</p>
                 </div>
             </div>
@@ -154,7 +155,6 @@ function displayIssues(issuesArray) {
 
 // === Filter Tabs (All, Open, Closed) ===
 function filterIssues(category) {
-    // Reset all buttons style first
     const tabs = ["all", "open", "closed"];
     tabs.forEach(tab => {
         let btn = document.getElementById("tab-" + tab);
@@ -162,16 +162,13 @@ function filterIssues(category) {
         btn.classList.add("bg-white", "text-gray-600", "border-gray-200");
     });
 
-    // Add active style to clicked button
     let activeTab = document.getElementById("tab-" + category.toLowerCase());
     activeTab.classList.remove("bg-white", "text-gray-600", "border-gray-200");
     activeTab.classList.add("bg-brand-purple", "text-white", "border-none");
 
-    // Clear container and show spinner
     issueContainer.innerHTML = "";
     loadingSpinner.classList.remove("hidden");
 
-    // Add fake delay to simulate loading
     setTimeout(function() {
         if (category === "All") {
             displayIssues(allIssuesData);
@@ -181,8 +178,6 @@ function filterIssues(category) {
             });
             displayIssues(filteredData);
         }
-        
-        // Hide spinner after data is loaded
         loadingSpinner.classList.add("hidden");
     }, 500); 
 }
@@ -197,20 +192,26 @@ document.getElementById("search-box").addEventListener("input", async function(e
             let searchResult = await response.json();
             let apiSearchData = searchResult.data || searchResult || [];
             
-            // Format search results to match the required UI text
-            let formattedSearchData = apiSearchData.map((issue, index) => ({
-                ...issue,
-                _id: issue._id + "_search_" + index,
-                title: "Fix Navigation Menu On Mobile Devices",
-                description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior."
-            }));
+            // Format search results with the same UI overrides
+            let modifiedSearchData = apiSearchData.map((issue, index) => {
+                let customLabels = ["bug", "help wanted"];
+                if (index === 5) {
+                    customLabels = ["enhancement"];
+                }
+                return {
+                    ...issue,
+                    title: "Fix Navigation Menu On Mobile Devices",
+                    description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.",
+                    labels: customLabels
+                };
+            });
             
-            displayIssues(formattedSearchData);
+            displayIssues(modifiedSearchData);
         } catch (error) {
             console.log("Search error:", error);
         }
     } else {
-        displayIssues(allIssuesData); // Show all 50 if input is empty
+        displayIssues(allIssuesData); 
     }
 });
 
@@ -222,14 +223,12 @@ async function showIssueDetails(id) {
     document.getElementById("modal-desc").innerText = "Loading data...";
 
     try {
-        // Since we modified the ID for duplicates, we need to extract original ID to fetch from API
-        let originalId = id.split('_')[0]; 
-        
-        let res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${originalId}`);
+        // Fetch specific issue data from API
+        let res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`);
         let singleData = await res.json();
         let issue = singleData.data || singleData;
 
-        // Force the title and description to match the UI card
+        // Force UI title and desc to match Figma
         document.getElementById("modal-title").innerText = "Fix Navigation Menu On Mobile Devices";
         document.getElementById("modal-desc").innerText = "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.";
         
@@ -237,11 +236,9 @@ async function showIssueDetails(id) {
         document.getElementById("modal-assignee").innerText = issue.assignee || "Fahim Ahmed";
         document.getElementById("modal-priority").innerText = (issue.priority || "HIGH").toUpperCase();
         
-        // Date format for modal
         let issueDate = issue.createdAt || issue.date;
         document.getElementById("modal-date").innerText = issueDate ? new Date(issueDate).toLocaleDateString() : "Unknown";
 
-        // Status badge
         let statusBadge = document.getElementById("modal-status");
         statusBadge.innerText = issue.status ? issue.status.toUpperCase() : "OPEN";
         
