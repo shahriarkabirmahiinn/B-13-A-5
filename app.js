@@ -1,4 +1,4 @@
-// ====== Get all needed HTML elements ======
+// Get all needed HTML elements 
 const loginPage = document.getElementById("login-page");
 const mainPage = document.getElementById("main-page");
 const loginForm = document.getElementById("login-form");
@@ -11,19 +11,19 @@ const totalIssuesText = document.getElementById("total-issues");
 const searchForm = document.getElementById("search-form");
 const searchBox = document.getElementById("search-box");
 
-// Variable to store data from API
+
 let globalIssues = []; 
 
-// ====== Step 1: Login Form Logic ======
+//  Login Form Logic 
 loginForm.addEventListener("submit", function(event) {
-    event.preventDefault(); // Stop page from refreshing
+    event.preventDefault(); 
 
     let usernameValue = document.getElementById("username").value;
     let passwordValue = document.getElementById("password").value;
 
     // Check if username and password match
     if (usernameValue === "admin" && passwordValue === "admin123") {
-        pageLoader.classList.remove("hidden"); // Show loading spinner
+        pageLoader.classList.remove("hidden"); 
         
         // Wait for half a second, then open dashboard
         setTimeout(function() {
@@ -31,18 +31,18 @@ loginForm.addEventListener("submit", function(event) {
             loginPage.classList.add("hidden");            
             mainPage.classList.remove("hidden");          
             
-            // Call function to load data from API
+            
             loadAllIssues(); 
         }, 500);
     } else {
-        // Show exact "Wrong username & password" error
+        
         errorMsg.classList.remove("hidden"); 
     }
 });
 
-// ====== Step 2: Fetch Data from API ======
+// Fetch Data from API 
 async function loadAllIssues() {
-    dataSpinner.classList.remove("hidden"); // Show spinner while loading
+    dataSpinner.classList.remove("hidden"); 
     issueContainer.innerHTML = ""; 
 
     try {
@@ -64,7 +64,7 @@ async function loadAllIssues() {
 
             finalIssues.push({
                 ...issue,
-                _id: (issue._id || "id") + "_" + i, // Make ID unique
+                _id: (issue._id || "id") + "_" + i, 
                 title: "Fix Navigation Menu On Mobile Devices",
                 description: "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.",
                 labels: customLabels
@@ -72,37 +72,37 @@ async function loadAllIssues() {
         }
         
         globalIssues = finalIssues; 
-        displayCards(globalIssues); // Show cards on screen
+        displayCards(globalIssues); 
     } catch (error) {
         console.log("Error fetching data:", error);
     }
 
-    dataSpinner.classList.add("hidden"); // Hide spinner
+    dataSpinner.classList.add("hidden"); 
 }
 
-// ====== Step 3: Create and Show Cards ======
+// Create and Show Cards 
 function displayCards(issuesList) {
-    issueContainer.innerHTML = ""; // Clear old cards
-    totalIssuesText.innerText = issuesList.length; // Update issue count number
+    issueContainer.innerHTML = ""; 
+    totalIssuesText.innerText = issuesList.length; 
 
     issuesList.forEach(function(issue) {
         
-        // Card top border color (Green for open, Purple for closed)
+        
         let borderClass = "border-open"; 
         if(issue.status && issue.status.toLowerCase() === "closed") {
             borderClass = "border-closed"; 
         }
 
-        // Priority colors
+        
         let priorityText = issue.priority ? issue.priority.toUpperCase() : "LOW";
-        let priorityStyle = "text-gray-600 bg-gray-100"; // default gray
+        let priorityStyle = "text-gray-600 bg-gray-100"; 
         if (priorityText === "HIGH") {
             priorityStyle = "text-red-500 bg-red-50";
         } else if (priorityText === "MEDIUM") {
             priorityStyle = "text-orange-500 bg-orange-50";
         }
 
-        // Colorful Label Pills for Cards (No text like "Status: Open" anymore)
+        
         let labelsHtml = "";
         if (issue.labels && Array.isArray(issue.labels)) {
             issue.labels.forEach(function(label) {
@@ -150,7 +150,7 @@ function displayCards(issuesList) {
     });
 }
 
-// ====== Step 4: Tab Filter (All, Open, Closed) ======
+// Tab Filter (All, Open, Closed) 
 function filterData(category) {
     // Change button styles when clicked
     let allTabs = document.querySelectorAll(".tab-btn");
@@ -180,7 +180,7 @@ function filterData(category) {
     }, 400);
 }
 
-// ====== Step 5: Search Functionality ======
+// Search Functionality 
 searchForm.addEventListener("submit", async function(event) {
     event.preventDefault(); 
     
@@ -217,11 +217,11 @@ searchForm.addEventListener("submit", async function(event) {
         
         dataSpinner.classList.add("hidden");
     } else {
-        displayCards(globalIssues); // Show all if search is empty
+        displayCards(globalIssues); 
     }
 });
 
-// ====== Step 6: Open Issue Details Modal ======
+// Open Issue Details Modal 
 async function openModal(id) {
     let modal = document.getElementById("issue-modal");
     modal.showModal();
@@ -256,7 +256,7 @@ async function openModal(id) {
             statusSpan.className = "px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#5A32FA]"; // Purple
         }
 
-        // Modal Priority Pill Color
+        
         let prioritySpan = document.getElementById("modal-priority");
         let priorityText = (issueData.priority || "HIGH").toUpperCase();
         prioritySpan.innerText = priorityText;
@@ -269,7 +269,7 @@ async function openModal(id) {
             prioritySpan.className = "inline-block px-4 py-1 rounded-full text-xs font-bold text-white bg-gray-500 shadow-sm"; // Gray
         }
 
-        // Modal Colorful Labels (NO Emojis, NO SVGs, just clean text boxes)
+        
         let labelsHtml = "";
         let labelsArray = issueData.labels && Array.isArray(issueData.labels) ? issueData.labels : ["bug", "help wanted"];
         
