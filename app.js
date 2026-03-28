@@ -221,32 +221,68 @@ async function showIssueDetails(id) {
     modal.showModal();
 
     document.getElementById("modal-desc").innerText = "Loading data...";
+    document.getElementById("modal-labels").innerHTML = "";
 
     try {
-        // Fetch specific issue data from API
+        // Fetch real data from API for the specific issue
         let res = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`);
         let singleData = await res.json();
         let issue = singleData.data || singleData;
 
-        // Force UI title and desc to match Figma
-        document.getElementById("modal-title").innerText = "Fix Navigation Menu On Mobile Devices";
-        document.getElementById("modal-desc").innerText = "The navigation menu doesn't collapse properly on mobile devices. Need to fix the responsive behavior.";
-        
-        document.getElementById("modal-author").innerText = issue.author || "Unknown";
+        // Set Texts from API Data
+        document.getElementById("modal-title").innerText = issue.title || "Fix broken image uploads";
+        document.getElementById("modal-desc").innerText = issue.description || "No description provided.";
+        document.getElementById("modal-author").innerText = issue.author || "Fahim Ahmed";
         document.getElementById("modal-assignee").innerText = issue.assignee || "Fahim Ahmed";
-        document.getElementById("modal-priority").innerText = (issue.priority || "HIGH").toUpperCase();
         
-        let issueDate = issue.createdAt || issue.date;
-        document.getElementById("modal-date").innerText = issueDate ? new Date(issueDate).toLocaleDateString() : "Unknown";
+        let priorityText = (issue.priority || "HIGH").toUpperCase();
+        document.getElementById("modal-priority").innerText = priorityText;
 
+        // Date format
+        let issueDate = issue.createdAt || issue.date;
+        document.getElementById("modal-date").innerText = issueDate ? new Date(issueDate).toLocaleDateString('en-GB') : "22/02/2026";
+
+        // Status badge format (Opened / Closed)
         let statusBadge = document.getElementById("modal-status");
-        statusBadge.innerText = issue.status ? issue.status.toUpperCase() : "OPEN";
+        let statusText = issue.status ? issue.status.toLowerCase() : "open";
         
-        if(issue.status && issue.status.toLowerCase() === "closed") {
-            statusBadge.className = "px-2 py-0.5 rounded text-xs font-semibold text-white bg-brand-purple";
+        if(statusText === "open" || statusText === "opened") {
+            statusBadge.innerText = "Opened";
+            statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold text-white bg-[#00A86B]"; // Green
         } else {
-            statusBadge.className = "px-2 py-0.5 rounded text-xs font-semibold text-white bg-[#238636]";
+            statusBadge.innerText = "Closed";
+            statusBadge.className = "px-3 py-1 rounded-full text-xs font-semibold text-white bg-brand-purple"; // Purple
         }
+
+        // Labels mapping with matching SVGs for the Modal
+        let labelsHtml = "";
+        let labelsArray = issue.labels && Array.isArray(issue.labels) ? issue.labels : ["bug", "help wanted"];
+        
+        labelsArray.forEach(function(label) {
+            let labelUpper = label.toUpperCase();
+            
+            if (labelUpper.includes("BUG")) {
+                labelsHtml += `
+                <span class="flex items-center gap-1.5 border border-red-200 text-red-500 bg-red-50 px-3 py-1 rounded-full text-[11px] font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="16" height="14" x="4" y="8" rx="4"/><path d="M12 16v-6"/><path d="M8 12h8"/></svg>
+                    BUG
+                </span>`;
+            } else if (labelUpper.includes("HELP WANTED")) {
+                labelsHtml += `
+                <span class="flex items-center gap-1.5 border border-yellow-300 text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full text-[11px] font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    HELP WANTED
+                </span>`;
+            } else if (labelUpper.includes("ENHANCEMENT")) {
+                labelsHtml += `
+                <span class="flex items-center gap-1.5 border border-green-200 text-green-600 bg-green-50 px-3 py-1 rounded-full text-[11px] font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    ENHANCEMENT
+                </span>`;
+            }
+        });
+        
+        document.getElementById("modal-labels").innerHTML = labelsHtml;
 
     } catch (error) {
         console.log("Error loading modal data", error);
