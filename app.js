@@ -27,14 +27,6 @@ loginForm.addEventListener("submit", function(event) {
     }
 });
 
-// Logout System
-document.getElementById("logout-btn").addEventListener("click", function() {
-    mainPage.classList.add("hidden");
-    loginPage.classList.remove("hidden");
-    document.getElementById("login-form").reset();
-    errorMsg.classList.add("hidden");
-});
-
 // === Fetch Data from API ===
 async function fetchIssuesFromAPI() {
     loadingSpinner.classList.remove("hidden");
