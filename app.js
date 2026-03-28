@@ -3,6 +3,7 @@ const loginPage = document.getElementById("login-page");
 const mainPage = document.getElementById("main-page");
 const loginForm = document.getElementById("login-form");
 const errorMsg = document.getElementById("error-msg");
+const pageTransitionLoader = document.getElementById("page-transition-loader"); // New loader
 
 const issueContainer = document.getElementById("issue-container");
 const loadingSpinner = document.getElementById("loading-spinner");
@@ -19,9 +20,19 @@ loginForm.addEventListener("submit", function(event) {
     let passVal = document.getElementById("password").value;
 
     if (userVal === "admin" && passVal === "admin123") {
-        loginPage.classList.add("hidden");
-        mainPage.classList.remove("hidden");
-        fetchIssuesFromAPI(); // Load data
+        
+        // 1. Show the full screen transition loader
+        pageTransitionLoader.classList.remove("hidden");
+        
+        // 2. Add a slight delay to simulate page loading (800 milliseconds)
+        setTimeout(function() {
+            pageTransitionLoader.classList.add("hidden"); // Hide loader
+            loginPage.classList.add("hidden");            // Hide login page
+            mainPage.classList.remove("hidden");          // Show main dashboard
+            
+            fetchIssuesFromAPI(); // Fetch the API data
+        }, 800);
+
     } else {
         errorMsg.classList.remove("hidden");
     }
